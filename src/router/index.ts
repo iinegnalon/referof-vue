@@ -6,18 +6,15 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'home',
+      name: 'Referof',
       component: HomeView,
     },
-    {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/AboutView.vue'),
-    },
   ],
+});
+
+router.beforeEach((to, from, next) => {
+  document.title = to.name?.toString() || 'Referof';
+  next();
 });
 
 export default router;
