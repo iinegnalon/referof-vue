@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import BaseModal from '@/components/common/BaseModal.vue';
+import BaseButton from '@/components/common/BaseButton.vue';
 
 const isModalOpen = ref(false);
 
@@ -12,7 +13,9 @@ function openModal() {
 <template>
   <main class="home-page">
     <div>
-      <button class="form-button" @click="openModal">Открыть форму</button>
+      <BaseButton class="form-button" @click="openModal">
+        Открыть форму
+      </BaseButton>
     </div>
 
     <BaseModal
