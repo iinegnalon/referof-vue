@@ -59,7 +59,7 @@ function toggle(val: string) {
 
 .checkbox-group {
   display: flex;
-  gap: 8px;
+  gap: 12px;
   flex-wrap: wrap;
 
   &--column {
