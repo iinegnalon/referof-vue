@@ -1,0 +1,180 @@
+<script lang="ts" setup>
+import { ref, watch } from 'vue';
+import IconCalendar from '@/components/icons/IconCalendar.vue';
+
+interface TimeOnly {
+  hours: number;
+  minutes: number;
+}
+
+const props = defineProps<{
+  modelValue: Date | null;
+  label?: string;
+}>();
+
+const emit = defineEmits(['update:modelValue']);
+
+const today = new Date();
+
+const dateOnly = ref<Date | null>(null);
+const timeOnly = ref<TimeOnly | null>(null);
+
+watch(
+  () => props.modelValue,
+  (val) => {
+    if (!val) {
+      dateOnly.value = null;
+      timeOnly.value = null;
+    } else {
+      dateOnly.value = new Date(val);
+      timeOnly.value = {
+        hours: dateOnly.value.getHours(),
+        minutes: dateOnly.value.getMinutes(),
+      };
+    }
+  },
+  { immediate: true },
+);
+
+function handleDateChange() {
+  if (!timeOnly.value) {
+    timeOnly.value = {
+      hours: 12,
+      minutes: 0,
+    };
+  }
+
+  updateFullDate();
+}
+
+function handleTimeChange() {
+  if (!dateOnly.value) {
+    dateOnly.value = new Date();
+  }
+
+  updateFullDate();
+}
+
+function updateFullDate() {
+  const d = dateOnly.value;
+  const t = timeOnly.value;
+
+  if (!d || !t) {
+    emit('update:modelValue', null);
+    return;
+  }
+
+  const merged = new Date(
+    d.getFullYear(),
+    d.getMonth(),
+    d.getDate(),
+    t.hours,
+    t.minutes,
+  );
+
+  emit('update:modelValue', merged);
+}
+</script>
+
+<template>
+  <div class="datetime-picker">
+    <span v-if="label" class="datetime-picker__label">{{ label }}</span>
+
+    <div class="datetime-picker__row">
+      <div class="datetime-picker__box datetime-picker__box--date">
+        <IconCalendar class="datetime-picker__icon" />
+        <div class="datetime-picker__input-wrapper">
+          <span class="datetime-picker__sub c2-r color-text-3">Дата</span>
+          <VueDatePicker
+            v-model="dateOnly"
+            :clearable="false"
+            :enable-time-picker="false"
+            :format="'dd.MM.yyyy'"
+            :placeholder="today.toLocaleDateString('ru')"
+            :ui="{ input: 'datetime-picker__input' }"
+            cancelText="Отмена"
+            locale="ru"
+            selectText="Принять"
+            @update:model-value="handleDateChange"
+          >
+            <template #input-icon />
+          </VueDatePicker>
+        </div>
+      </div>
+
+      <div class="datetime-picker__box datetime-picker__box--time">
+        <VueDatePicker
+          v-model="timeOnly"
+          :clearable="false"
+          :format="'HH:mm'"
+          :ui="{ input: 'datetime-picker__input' }"
+          cancelText="Отмена"
+          locale="ru"
+          placeholder="12:00"
+          selectText="Принять"
+          time-picker
+          @update:model-value="handleTimeChange"
+        >
+          <template #input-icon />
+        </VueDatePicker>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style lang="scss" scoped>
+@import '@/assets/css/variables.scss';
+
+.datetime-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  &__label {
+    color: $color-text-4;
+  }
+
+  &__row {
+    display: flex;
+    gap: 4px;
+  }
+
+  &__box {
+    background-color: $color-surface-3;
+    border-radius: 12px;
+    padding: 5px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-sizing: border-box;
+
+    &--date {
+      max-width: 140px;
+    }
+
+    &--time {
+      max-width: 80px;
+    }
+  }
+
+  &__input-wrapper {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__icon {
+    width: 24px;
+    height: 24px;
+    color: $color-text-3;
+    flex-shrink: 0;
+  }
+
+  :deep(.datetime-picker__input) {
+    border: none;
+    outline: none;
+    background: transparent;
+    font: inherit;
+    padding: 0;
+  }
+}
+</style>
