@@ -18,6 +18,7 @@ const props = withDefaults(
 const emit = defineEmits(['update:modelValue', 'modal-close']);
 
 function emitClose() {
+  emit('modal-close');
   emit('update:modelValue', false);
 }
 

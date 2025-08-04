@@ -29,6 +29,7 @@ withDefaults(
 .base-button {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   padding: 11px;
   border-radius: 12px;
   font-size: inherit;

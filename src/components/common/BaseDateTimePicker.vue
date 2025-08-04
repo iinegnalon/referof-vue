@@ -14,8 +14,6 @@ const props = defineProps<{
 
 const emit = defineEmits(['update:modelValue']);
 
-const today = new Date();
-
 const dateOnly = ref<Date | null>(null);
 const timeOnly = ref<TimeOnly | null>(null);
 
@@ -90,10 +88,10 @@ function updateFullDate() {
             :clearable="false"
             :enable-time-picker="false"
             :format="'dd.MM.yyyy'"
-            :placeholder="today.toLocaleDateString('ru')"
             :ui="{ input: 'datetime-picker__input' }"
             cancelText="Отмена"
             locale="ru"
+            placeholder="дд.мм.гггг"
             selectText="Принять"
             @update:model-value="handleDateChange"
           >
@@ -110,7 +108,7 @@ function updateFullDate() {
           :ui="{ input: 'datetime-picker__input' }"
           cancelText="Отмена"
           locale="ru"
-          placeholder="12:00"
+          placeholder="--:--"
           selectText="Принять"
           time-picker
           @update:model-value="handleTimeChange"

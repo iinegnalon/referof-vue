@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
-import BaseModal from '@/components/common/BaseModal.vue';
 import BaseButton from '@/components/common/BaseButton.vue';
+import PromoCodeModal from '@/components/home/PromoCodeModal.vue';
 
-const isModalOpen = ref(false);
+const promoCodeModalOpen = ref(false);
 
 function openModal() {
-  isModalOpen.value = true;
+  promoCodeModalOpen.value = true;
 }
 </script>
 
@@ -18,14 +18,7 @@ function openModal() {
       </BaseButton>
     </div>
 
-    <BaseModal
-      v-model="isModalOpen"
-      :close-on-click-outside="false"
-      content-class="home-page-form-modal"
-    >
-      <h4>Создание промокода</h4>
-      <div>Контент</div>
-    </BaseModal>
+    <PromoCodeModal v-model="promoCodeModalOpen" />
   </main>
 </template>
 
