@@ -1,27 +1,43 @@
 <script lang="ts" setup>
+import { ref, watch } from 'vue';
+
 const props = withDefaults(
   defineProps<{
-    modelValue: string[];
+    modelValue?: string[];
     options: Array<{ label: string; value: string }>;
     direction?: 'column' | 'row';
+    error?: boolean | string;
   }>(),
   {
     direction: 'column',
   },
 );
 
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue', 'change']);
+
+const inputValue = ref<string[]>([]);
+
+watch(
+  () => props.modelValue,
+  (val) => {
+    if (val) {
+      inputValue.value = val;
+    }
+  },
+  { immediate: true },
+);
 
 function isChecked(val: string) {
-  return props.modelValue.includes(val);
+  return inputValue.value.includes(val);
 }
 
 function toggle(val: string) {
   const newValue = isChecked(val)
-    ? props.modelValue.filter((v) => v !== val)
-    : [...props.modelValue, val];
+    ? inputValue.value.filter((v) => v !== val)
+    : [...inputValue.value, val];
 
   emit('update:modelValue', newValue);
+  emit('change', newValue);
 }
 </script>
 

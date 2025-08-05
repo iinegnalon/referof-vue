@@ -19,6 +19,7 @@ const isModalOpen = computed({
 });
 
 const schema = yup.object({
+  // Step 1
   promoCodeName: yup.string().required('Обязательное поле').max(30),
   title: yup.string().required('Обязательное поле').max(120),
   additionalText: yup.string().max(250),
@@ -27,11 +28,36 @@ const schema = yup.object({
     .integer('Введите целое число')
     .required('Обязательное поле')
     .typeError('Введите целое число'),
+
+  // Step 2
+  startDate: yup.date().required('Обязательное поле'),
+  hasNoEndDate: yup.boolean(),
+  endDate: yup
+    .date()
+    // Check if no end date needed
+    .when('hasNoEndDate', {
+      is: (val: boolean | undefined) => !val,
+      then: (schema) => schema.required('Обязательное поле'),
+      otherwise: (schema) => schema.nullable().notRequired(),
+    })
+    // Check if end date is after start date
+    .when('startDate', {
+      is: (startDate: Date) => !!startDate,
+      then: (schema) =>
+        schema.min(
+          yup.ref('startDate'),
+          'Дата конца не может быть раньше даты начала',
+        ),
+    }),
   activationsLimit: yup
     .number()
     .integer('Введите целое число')
     .required('Обязательное поле')
     .typeError('Введите целое число'),
+  sendMode: yup
+    .string()
+    .oneOf(['noSend', 'sendAll'], 'Выберите один из вариантов')
+    .required('Выберите один из вариантов'),
 });
 const formContext = useForm({ validationSchema: schema });
 
@@ -45,6 +71,7 @@ function close() {
 async function goNext() {
   const { validateField } = formContext;
 
+  // First step validation
   const results = await Promise.all([
     validateField('promoCodeName'),
     validateField('title'),
@@ -63,8 +90,23 @@ function goBack() {
   currentStep.value = 1;
 }
 
-function createPromoCode() {
-  close();
+async function createPromoCode() {
+  const { validateField } = formContext;
+
+  // Second step validation
+  const results = await Promise.all([
+    validateField('startDate'),
+    validateField('endDate'),
+    validateField('activationsLimit'),
+    validateField('sendMode'),
+  ]);
+
+  const valid = results.every((r) => r.valid);
+
+  if (valid) {
+    console.log('Итоговые данные формы: ', { ...formContext.values });
+    close();
+  }
 }
 </script>
 
@@ -93,14 +135,12 @@ function createPromoCode() {
 
       <div v-if="currentStep === 1" class="promo-code-modal__footer">
         <BaseButton variant="secondary" @click="close">Отмена</BaseButton>
-        <BaseButton type="submit" @click="goNext"> Далее</BaseButton>
+        <BaseButton @click="goNext"> Далее</BaseButton>
       </div>
 
       <div v-else class="promo-code-modal__footer">
         <BaseButton variant="secondary" @click="goBack">Назад</BaseButton>
-        <BaseButton type="submit" @click="createPromoCode">
-          Создать
-        </BaseButton>
+        <BaseButton @click="createPromoCode"> Создать</BaseButton>
       </div>
     </form>
   </BaseModal>

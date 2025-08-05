@@ -8,8 +8,9 @@ interface TimeOnly {
 }
 
 const props = defineProps<{
-  modelValue: Date | null;
+  modelValue?: Date | null;
   label?: string;
+  error?: boolean | string;
 }>();
 
 const emit = defineEmits(['update:modelValue']);
@@ -35,9 +36,10 @@ watch(
 );
 
 function handleDateChange() {
+  // Set time to 00:00 if only date is set
   if (!timeOnly.value) {
     timeOnly.value = {
-      hours: 12,
+      hours: 0,
       minutes: 0,
     };
   }
@@ -46,6 +48,7 @@ function handleDateChange() {
 }
 
 function handleTimeChange() {
+  // Set date to today if only time is set
   if (!dateOnly.value) {
     dateOnly.value = new Date();
   }
@@ -62,6 +65,7 @@ function updateFullDate() {
     return;
   }
 
+  // Merge date and time into single date
   const merged = new Date(
     d.getFullYear(),
     d.getMonth(),
@@ -75,8 +79,10 @@ function updateFullDate() {
 </script>
 
 <template>
-  <div class="datetime-picker">
-    <span v-if="label" class="datetime-picker__label">{{ label }}</span>
+  <div :class="{ 'datetime-picker--error': error }" class="datetime-picker">
+    <span v-if="label" class="datetime-picker__label">
+      {{ label }}
+    </span>
 
     <div class="datetime-picker__row">
       <div class="datetime-picker__box datetime-picker__box--date">
@@ -88,6 +94,7 @@ function updateFullDate() {
             :clearable="false"
             :enable-time-picker="false"
             :format="'dd.MM.yyyy'"
+            :teleport="true"
             :ui="{ input: 'datetime-picker__input' }"
             cancelText="Отмена"
             locale="ru"
@@ -105,6 +112,7 @@ function updateFullDate() {
           v-model="timeOnly"
           :clearable="false"
           :format="'HH:mm'"
+          :teleport="true"
           :ui="{ input: 'datetime-picker__input' }"
           cancelText="Отмена"
           locale="ru"
@@ -117,6 +125,15 @@ function updateFullDate() {
         </VueDatePicker>
       </div>
     </div>
+
+    <div class="datetime-picker__footer">
+      <div
+        v-if="typeof error === 'string'"
+        class="datetime-picker__error c2-r color-text-error"
+      >
+        {{ error }}
+      </div>
+    </div>
   </div>
 </template>
 
@@ -127,6 +144,16 @@ function updateFullDate() {
   display: flex;
   flex-direction: column;
   gap: 6px;
+
+  &--error {
+    .datetime-picker__label {
+      color: $color-text-error;
+    }
+
+    .datetime-picker__box {
+      border: 1px solid $color-text-error;
+    }
+  }
 
   &__label {
     color: $color-text-4;

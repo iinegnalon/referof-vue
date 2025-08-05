@@ -18,6 +18,9 @@
   padding: 24px;
   min-width: 260px;
   width: fit-content;
+  overflow-y: auto;
+  height: fit-content;
+  max-height: 95%;
 }
 
 .modal-close {

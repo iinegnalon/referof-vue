@@ -1,19 +1,35 @@
 <script lang="ts" setup>
+import { ref, watch } from 'vue';
+
 const props = withDefaults(
   defineProps<{
-    modelValue: string | null;
-    options: Array<{ label: string; value: string | number }>;
+    modelValue?: string | null;
+    options: Array<{ label: string; value: string }>;
     direction?: 'column' | 'row';
+    error?: boolean | string;
   }>(),
   {
     direction: 'column',
   },
 );
 
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue', 'change']);
 
-function update(value: string | number) {
+const inputValue = ref<string | null>(null);
+
+watch(
+  () => props.modelValue,
+  (val) => {
+    if (val) {
+      inputValue.value = val;
+    }
+  },
+  { immediate: true },
+);
+
+function update(value: string) {
   emit('update:modelValue', value);
+  emit('change', value);
 }
 </script>
 
@@ -23,6 +39,7 @@ function update(value: string | number) {
       'radio-group': true,
       'radio-group--row': props.direction === 'row',
       'radio-group--column': props.direction !== 'row',
+      'radio-group--error': error,
     }"
   >
     <label
@@ -32,12 +49,12 @@ function update(value: string | number) {
     >
       <span
         :class="{
-          'radio-group__circle--selected': modelValue === option.value,
+          'radio-group__circle--selected': inputValue === option.value,
         }"
         class="radio-group__circle"
       />
       <input
-        :checked="modelValue === option.value"
+        v-model="inputValue"
         :value="option.value"
         class="radio-group__input"
         type="radio"
@@ -45,6 +62,15 @@ function update(value: string | number) {
       />
       <span class="radio-group__label">{{ option.label }}</span>
     </label>
+
+    <div class="radio-group__footer">
+      <div
+        v-if="typeof error === 'string'"
+        class="radio-group__error c2-r color-text-error"
+      >
+        {{ error }}
+      </div>
+    </div>
   </div>
 </template>
 
@@ -62,6 +88,12 @@ function update(value: string | number) {
 
   &--row {
     flex-direction: row;
+  }
+
+  &--error {
+    .radio-group__circle {
+      border-color: $color-text-error;
+    }
   }
 
   &__item {

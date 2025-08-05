@@ -7,6 +7,7 @@ import IconCoin from '@/components/icons/IconCoin.vue';
 
 <template>
   <div class="promo-code-step-one">
+    <!--Promo code name-->
     <Field v-slot="{ field, errorMessage }" name="promoCodeName">
       <BaseInput
         :error="errorMessage"
@@ -19,6 +20,7 @@ import IconCoin from '@/components/icons/IconCoin.vue';
       />
     </Field>
 
+    <!--Promo code title-->
     <Field v-slot="{ field, errorMessage }" name="title">
       <BaseInput
         :error="errorMessage"
@@ -30,6 +32,7 @@ import IconCoin from '@/components/icons/IconCoin.vue';
       />
     </Field>
 
+    <!--Additional text-->
     <Field v-slot="{ field, errorMessage }" name="additionalText">
       <BaseTextarea
         :error="errorMessage"
@@ -40,6 +43,7 @@ import IconCoin from '@/components/icons/IconCoin.vue';
       />
     </Field>
 
+    <!--Points-->
     <Field v-slot="{ field, errorMessage }" name="points">
       <BaseInput
         :error="errorMessage"
