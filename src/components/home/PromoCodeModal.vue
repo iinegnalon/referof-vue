@@ -4,6 +4,8 @@ import PromoCodeStepOne from './PromoCodeStepOne.vue';
 import PromoCodeStepTwo from './PromoCodeStepTwo.vue';
 import { computed, ref } from 'vue';
 import BaseButton from '@/components/common/BaseButton.vue';
+import { useForm } from 'vee-validate';
+import * as yup from 'yup';
 
 const props = defineProps<{
   modelValue: boolean;
@@ -16,18 +18,48 @@ const isModalOpen = computed({
   set: (val) => emit('update:modelValue', val),
 });
 
+const schema = yup.object({
+  promoCodeName: yup.string().required('Обязательное поле').max(30),
+  title: yup.string().required('Обязательное поле').max(120),
+  additionalText: yup.string().max(250),
+  points: yup
+    .number()
+    .integer('Введите целое число')
+    .required('Обязательное поле')
+    .typeError('Введите целое число'),
+  activationsLimit: yup
+    .number()
+    .integer('Введите целое число')
+    .required('Обязательное поле')
+    .typeError('Введите целое число'),
+});
+const formContext = useForm({ validationSchema: schema });
+
 const currentStep = ref(1);
-
-function goNext() {
-  currentStep.value = 2;
-}
-
-function goBack() {
-  currentStep.value = 1;
-}
 
 function close() {
   isModalOpen.value = false;
+  currentStep.value = 1;
+}
+
+async function goNext() {
+  const { validateField } = formContext;
+
+  const results = await Promise.all([
+    validateField('promoCodeName'),
+    validateField('title'),
+    validateField('additionalText'),
+    validateField('points'),
+  ]);
+
+  const valid = results.every((r) => r.valid);
+
+  if (valid) {
+    currentStep.value = 2;
+  }
+}
+
+function goBack() {
   currentStep.value = 1;
 }
 
@@ -43,30 +75,34 @@ function createPromoCode() {
     content-class="promo-code-modal"
     @modal-close="close"
   >
-    <div class="promo-code-modal__header">
-      <h4 class="promo-code-modal__title">Создание промокода</h4>
-      <div class="promo-code-modal__steps">
-        <span :class="{ active: currentStep === 1 }"> Шаг 1: Основное </span>
-        <span :class="{ active: currentStep === 2 }">
-          Шаг 2: Настройки промокода
-        </span>
+    <form @submit.prevent>
+      <div class="promo-code-modal__header">
+        <h4 class="promo-code-modal__title">Создание промокода</h4>
+        <div class="promo-code-modal__steps">
+          <span :class="{ active: currentStep === 1 }"> Шаг 1: Основное </span>
+          <span :class="{ active: currentStep === 2 }">
+            Шаг 2: Настройки промокода
+          </span>
+        </div>
       </div>
-    </div>
 
-    <div class="promo-code-modal__body">
-      <PromoCodeStepOne v-if="currentStep === 1" />
-      <PromoCodeStepTwo v-else />
-    </div>
+      <div class="promo-code-modal__body">
+        <PromoCodeStepOne v-show="currentStep === 1" />
+        <PromoCodeStepTwo v-show="currentStep === 2" />
+      </div>
 
-    <div v-if="currentStep === 1" class="promo-code-modal__footer">
-      <BaseButton variant="secondary" @click="close">Отмена</BaseButton>
-      <BaseButton @click="goNext">Далее</BaseButton>
-    </div>
+      <div v-if="currentStep === 1" class="promo-code-modal__footer">
+        <BaseButton variant="secondary" @click="close">Отмена</BaseButton>
+        <BaseButton type="submit" @click="goNext"> Далее</BaseButton>
+      </div>
 
-    <div v-else class="promo-code-modal__footer">
-      <BaseButton variant="secondary" @click="goBack">Назад</BaseButton>
-      <BaseButton @click="createPromoCode">Создать</BaseButton>
-    </div>
+      <div v-else class="promo-code-modal__footer">
+        <BaseButton variant="secondary" @click="goBack">Назад</BaseButton>
+        <BaseButton type="submit" @click="createPromoCode">
+          Создать
+        </BaseButton>
+      </div>
+    </form>
   </BaseModal>
 </template>
 

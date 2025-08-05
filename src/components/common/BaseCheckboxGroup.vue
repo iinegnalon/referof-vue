@@ -3,7 +3,7 @@ const props = withDefaults(
   defineProps<{
     modelValue: string[];
     options: Array<{ label: string; value: string }>;
-    direction?: string; // 'column' | 'row'
+    direction?: 'column' | 'row';
   }>(),
   {
     direction: 'column',

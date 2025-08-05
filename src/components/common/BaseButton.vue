@@ -1,12 +1,14 @@
 <script lang="ts" setup>
 withDefaults(
   defineProps<{
-    variant?: string; // 'primary' | 'secondary'
+    variant?: 'primary' | 'secondary';
     disabled?: boolean;
+    type?: 'submit' | 'button' | 'reset';
   }>(),
   {
     variant: 'primary',
     disabled: false,
+    type: 'button',
   },
 );
 </script>
@@ -15,6 +17,7 @@ withDefaults(
   <button
     :class="[`base-button--${variant}`, { 'base-button--disabled': disabled }]"
     :disabled="disabled"
+    :type="type"
     class="base-button"
   >
     <span class="base-button__label">

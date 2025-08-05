@@ -17,7 +17,7 @@ defineProps<{
     >
       <span v-if="label" class="base-field-wrapper__label">
         {{ label
-        }}<span v-if="required" class="base-field-wrapper__required"> * </span>
+        }}<span v-if="required" class="base-field-wrapper__required">*</span>
       </span>
 
       <span class="base-field-wrapper__wrapper">

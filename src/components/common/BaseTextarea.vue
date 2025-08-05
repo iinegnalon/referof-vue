@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import { computed, type Ref, ref } from 'vue';
+import { type Ref, ref } from 'vue';
 import BaseFieldWrapper from '@/components/common/BaseFieldWrapper.vue';
 
 const props = withDefaults(
   defineProps<{
-    modelValue?: string | number;
+    modelValue?: string;
     id?: string;
     label?: string;
     placeholder?: string;
@@ -23,11 +23,15 @@ const props = withDefaults(
 const emit = defineEmits(['update:modelValue']);
 
 const inputRef: Ref<HTMLInputElement | null> = ref(null);
-
-const textLength = computed(() => props.modelValue?.toString().length ?? 0);
+const textLength = ref(0);
 
 function updateValue(event: Event) {
-  emit('update:modelValue', event.target?.value);
+  const target = event.target as HTMLInputElement;
+  let value = target?.value;
+
+  textLength.value = value.length;
+
+  emit('update:modelValue', value);
 }
 </script>
 
@@ -71,16 +75,6 @@ function updateValue(event: Event) {
   background: transparent;
   resize: none;
   width: 100%;
-
-  &[type='number'] {
-    -moz-appearance: textfield;
-  }
-
-  &[type='number']::-webkit-outer-spin-button,
-  &[type='number']::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
 
   &::placeholder {
     color: $color-text-2;

@@ -12,6 +12,7 @@ const props = withDefaults(
     error?: boolean | string;
     required?: boolean;
     maxLength?: number;
+    uppercase?: boolean;
   }>(),
   {
     type: 'text',
@@ -37,7 +38,14 @@ onBeforeUnmount(() => {
 });
 
 function updateValue(event: Event) {
-  emit('update:modelValue', event.target?.value);
+  const target = event.target as HTMLInputElement;
+  let value = target?.value;
+
+  if (props.uppercase) {
+    value = value.toUpperCase();
+  }
+
+  emit('update:modelValue', value);
 }
 
 function disableWheelScroll(event: WheelEvent) {
@@ -87,6 +95,7 @@ function handleKeydown(event: KeyboardEvent) {
   border: none;
   outline: none;
   background: transparent;
+  width: 100%;
 
   &[type='number'] {
     -moz-appearance: textfield;
